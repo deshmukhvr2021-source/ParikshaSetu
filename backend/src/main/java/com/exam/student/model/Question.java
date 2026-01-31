@@ -19,14 +19,19 @@ public class Question {
 
     private String correctAnswer;
 
+    private String type; // MCQ, SUBJECTIVE
+
+    private int marks;
+
     @ManyToOne
     @JoinColumn(name = "exam_id")
     private Exam exam;
 
-    public Question() {}
+    public Question() {
+    }
 
     public Question(String questionText, String optionA, String optionB,
-                    String optionC, String optionD, String correctAnswer, Exam exam) {
+            String optionC, String optionD, String correctAnswer, Exam exam) {
         this.questionText = questionText;
         this.optionA = optionA;
         this.optionB = optionB;
@@ -98,5 +103,21 @@ public class Question {
 
     public void setExam(Exam exam) {
         this.exam = exam;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public int getMarks() {
+        return marks;
+    }
+
+    public void setMarks(int marks) {
+        this.marks = marks;
     }
 }

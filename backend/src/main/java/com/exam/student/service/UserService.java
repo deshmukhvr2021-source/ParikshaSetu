@@ -12,14 +12,43 @@ import com.exam.student.repository.UserRepository;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+    private final com.exam.student.repository.StudentRepository studentRepository;
+    private final com.exam.student.repository.TeacherRepository teacherRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository,
+            org.springframework.security.crypto.password.PasswordEncoder passwordEncoder,
+            com.exam.student.repository.StudentRepository studentRepository,
+            com.exam.student.repository.TeacherRepository teacherRepository) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.studentRepository = studentRepository;
+        this.teacherRepository = teacherRepository;
     }
 
     // Create user
     public User saveUser(User user) {
-        return userRepository.save(user);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User savedUser = userRepository.save(user);
+
+        // Auto-create Student or Teacher entity based on role
+        if ("STUDENT".equals(user.getRole())) {
+            com.exam.student.model.Student student = new com.exam.student.model.Student();
+            student.setUser(savedUser);
+            student.setRollNumber(generateRollNumber());
+            studentRepository.save(student);
+        } else if ("TEACHER".equals(user.getRole())) {
+            com.exam.student.model.Teacher teacher = new com.exam.student.model.Teacher();
+            teacher.setUser(savedUser);
+            teacher.setSubject("General");
+            teacherRepository.save(teacher);
+        }
+
+        return savedUser;
+    }
+
+    private String generateRollNumber() {
+        return "STU" + System.currentTimeMillis();
     }
 
     // Get all users

@@ -23,7 +23,19 @@ public class Exam {
     @JoinColumn(name = "teacher_id")
     private Teacher teacher;
 
-    public Exam() {}
+    @ManyToOne
+    @JoinColumn(name = "subject_id")
+    private Subject subject;
+
+    @OneToMany(mappedBy = "exam", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<Question> questions = new java.util.ArrayList<>();
+
+    private int totalMarks;
+
+    private String status; // CREATED, PUBLISHED, CLOSED
+
+    public Exam() {
+    }
 
     public Exam(String title, int durationMinutes, LocalDateTime startTime, LocalDateTime endTime, Teacher teacher) {
         this.title = title;
@@ -79,5 +91,50 @@ public class Exam {
 
     public void setTeacher(Teacher teacher) {
         this.teacher = teacher;
+    }
+
+    public Subject getSubject() {
+        return subject;
+    }
+
+    public void setSubject(Subject subject) {
+        this.subject = subject;
+    }
+
+    public int getTotalMarks() {
+        return totalMarks;
+    }
+
+    public void setTotalMarks(int totalMarks) {
+        this.totalMarks = totalMarks;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public java.util.List<Question> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(java.util.List<Question> questions) {
+        this.questions = questions;
+        for (Question q : questions) {
+            q.setExam(this);
+        }
+    }
+
+    public void addQuestion(Question question) {
+        questions.add(question);
+        question.setExam(this);
+    }
+
+    public void removeQuestion(Question question) {
+        questions.remove(question);
+        question.setExam(null);
     }
 }
